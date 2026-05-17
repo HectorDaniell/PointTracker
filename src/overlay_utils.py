@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 from PIL import Image, ImageSequence
 
-def load_gif_frames(gif_path, scale=2.5, skip_frames=3):
+def load_gif_frames(gif_path, scale=2.5, skip_frames=1):
     gif = Image.open(gif_path)
     frames = []
     w, h = gif.size
