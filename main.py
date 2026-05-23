@@ -8,6 +8,10 @@ frames_cat = load_gif_frames("assets/cat_animation.gif", scale=2.5)
 frames_nick = load_gif_frames("assets/nick_animation.gif", scale=1.0)
 sound_path = "assets/scubbaaa.mp3"
 
+WINDOW_MARGIN = 30
+scuba_window_pos = (WINDOW_MARGIN, WINDOW_MARGIN)
+nick_window_pos = (WINDOW_MARGIN * 2 + frames_cat[0].shape[1], WINDOW_MARGIN)
+
 all_frames = [frames_cat, frames_nick]
 current_indices = [0, 0]
 prev_x_positions = [0, 0]
@@ -70,6 +74,8 @@ while True:
             cv2.namedWindow("Scuba Cat", cv2.WINDOW_AUTOSIZE)
             cv2.namedWindow("Nick Wilde", cv2.WINDOW_AUTOSIZE)
             cv2.resizeWindow("Nick Wilde", 400, 400)
+            cv2.moveWindow("Scuba Cat", scuba_window_pos[0], scuba_window_pos[1])
+            cv2.moveWindow("Nick Wilde", nick_window_pos[0], nick_window_pos[1])
             last_frame_advance_times = [now, now]
             start_window_sound()
             both_windows_active = True
