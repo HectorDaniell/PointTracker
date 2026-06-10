@@ -11,14 +11,15 @@ sound_path = "assets/scubbaaa.mp3"
 WINDOW_MARGIN = 30
 scuba_window_pos = (WINDOW_MARGIN, WINDOW_MARGIN)
 nick_window_pos = (WINDOW_MARGIN * 2 + frames_cat[0].shape[1], WINDOW_MARGIN)
+HANDS_REQUIRED = 2
+HAND_LOSS_GRACE_SECONDS = 1.0
 
 all_frames = [frames_cat, frames_nick]
 current_indices = [0, 0]
-prev_x_positions = [0, 0]
 last_frame_advance_times = [time.perf_counter(), time.perf_counter()]
 frame_intervals = [1 / 15, 1 / 15]
 
-unified_last_move_time = 0
+two_hands_last_seen_time = 0.0
 both_windows_active = False
 
 sound_available = False
@@ -51,23 +52,17 @@ while True:
     img = cv2.flip(img, 1)
     
     img = detector.find_hands(img)
-    movement_detected = False
     detected_hands = detector.results.multi_hand_landmarks or []
+    now_time = time.time()
 
-    if len(detected_hands) >= 2:
-        for i, hand_lms in enumerate(detected_hands):
-            if i < 2:
-                h, w, c = img.shape
-                curr_x = int(hand_lms.landmark[0].x * w)
+    if len(detected_hands) >= HANDS_REQUIRED:
+        two_hands_last_seen_time = now_time
 
-                if abs(curr_x - prev_x_positions[i]) > 10:
-                    prev_x_positions[i] = curr_x
-                    movement_detected = True
+    should_show_windows = (
+        now_time - two_hands_last_seen_time <= HAND_LOSS_GRACE_SECONDS
+    )
 
-    if movement_detected:
-        unified_last_move_time = time.time()
-
-    if len(detected_hands) >= 2 and time.time() - unified_last_move_time < 0.5:
+    if should_show_windows:
         now = time.perf_counter()
 
         if not both_windows_active:
